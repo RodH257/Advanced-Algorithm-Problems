@@ -1,0 +1,11 @@
+5
+the
+the quick brown fox jumps over the lazy dog
+000111
+010101010101000110000111
+CGAT
+TGATCTAGCTAGCTAGCTAGCTAGCATACGCATAGCTA
+happy
+I could be happy if I didn't have to work
+0010101
+010111010010101
