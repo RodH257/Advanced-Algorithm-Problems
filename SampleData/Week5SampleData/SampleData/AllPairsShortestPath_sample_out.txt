@@ -1,0 +1,12 @@
+1
+0 10 30 12 15 
+NP 0 NP 2 5 
+NP NP 0 NP 6 
+NP NP NP 0 3 
+NP NP NP NP 0 
+2
+0 8 14 2 5 
+NP 0 6 10 13 
+NP NP 0 4 7 
+NP NP NP 0 3 
+NP NP NP NP 0 

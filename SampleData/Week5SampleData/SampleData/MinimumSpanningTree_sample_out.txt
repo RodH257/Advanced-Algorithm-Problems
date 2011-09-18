@@ -1,0 +1,2 @@
+Test 1, minimum spanning tree weight = 21
+Test 2, minimum spanning tree weight = 15

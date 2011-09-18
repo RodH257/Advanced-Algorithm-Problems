@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace HomeworkProblems
 {
@@ -12,7 +13,6 @@ namespace HomeworkProblems
         private const int NOT_INITIALIZED = -1;
         private static void Main(string[] args)
         {
-
             while (true)
             {
                 string line = Console.ReadLine();
@@ -67,8 +67,25 @@ namespace HomeworkProblems
             //equatable for visited list 
             public bool Equals(JarState other)
             {
+                //int thisHashCode = this.GetHashCode();
+                //int otherHashCode = other.GetHashCode();
+                //bool theSame = thisHashCode == otherHashCode;
+                //return theSame;
                 return (this.Jars[A] == other.Jars[A] && this.Jars[B] == other.Jars[B] && this.Jars[C] == other.Jars[C]);
 
+            }
+
+            public override bool Equals(object obj)
+            {
+                if (obj is JarState)
+                    return Equals((JarState)obj);
+
+                return base.Equals(obj);
+            }
+
+            public override int GetHashCode()
+            {
+                return (Jars[0] * 10) * (Jars[1] * 20) * (Jars[2] * 30);
             }
         }
 
@@ -78,26 +95,18 @@ namespace HomeworkProblems
             //setup the first jar state
             JarState firstState = new JarState(jarA, jarB, jarC) { Level = 0 };
 
-            List<JarState> visitedNodes = new List<JarState>();
-
+            HashSet<JarState> visitedNodes = new HashSet<JarState>();
             Queue<JarState> nodes = new Queue<JarState>();
             nodes.Enqueue(firstState);
-
-            int smallestLevelWithResult = NOT_INITIALIZED;
 
             while (nodes.Count != 0)
             {
                 //get first node, and check it 
                 JarState currentState = nodes.Dequeue();
                 visitedNodes.Add(currentState);
-                if (currentState.HasEmptyJar())
-                {
-                    //we're done, see if its the smallest 
-                    if (smallestLevelWithResult == NOT_INITIALIZED || currentState.Level < smallestLevelWithResult)
-                        smallestLevelWithResult = currentState.Level;
 
-                    continue;
-                }
+                if (currentState.HasEmptyJar())
+                    return currentState.Level;
 
                 //wasn't empty, so find the  various options to add to the queue. 
                 for (int jarIndex = 0; jarIndex < 3; jarIndex++)
@@ -120,19 +129,13 @@ namespace HomeworkProblems
                             newState.Jars[jarIndex] -= newState.Jars[jarToCompareIndex];
                             newState.Jars[jarToCompareIndex] *= 2;
 
-                            if (smallestLevelWithResult == NOT_INITIALIZED || newState.Level < smallestLevelWithResult)
-                            //queue it because its a possibility for the smallest result.
-                            {
-                                if (!visitedNodes.Contains(newState))
-                                {
-                                    nodes.Enqueue(newState);
-                                }
-                            }
+                            if (!visitedNodes.Contains(newState))
+                                nodes.Enqueue(newState);
                         }
                     }
                 }
             }
-            return smallestLevelWithResult;
+            return -1;
         }
 
     }

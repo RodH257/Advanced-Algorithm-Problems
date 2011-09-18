@@ -1,0 +1,2 @@
+N=4: 2 permutations
+N=5: 10 permutations

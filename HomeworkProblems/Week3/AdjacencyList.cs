@@ -12,7 +12,7 @@ namespace HomeworkProblems
 
         private class GraphNode
         {
-            public GraphNode FirstNode;
+           // public GraphNode FirstNode;
             public LinkedList<GraphNode> AdjacentNodes = new LinkedList<GraphNode>();
 
             public int NodeNumber;

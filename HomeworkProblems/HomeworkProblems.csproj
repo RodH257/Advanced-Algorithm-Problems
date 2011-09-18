@@ -34,11 +34,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>HomeworkProblems.EditDistance</StartupObject>
+    <StartupObject>HomeworkProblems.ConvexHull</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Numerics" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -57,8 +58,22 @@
     <Compile Include="Week3\AdjacencyList.cs" />
     <Compile Include="Week3\GraphTraversal.cs" />
     <Compile Include="Week3\Monks.cs" />
+    <Compile Include="Week4\DiagonalShortcuts.cs" />
     <Compile Include="Week4\CountingPaths.cs" />
     <Compile Include="Week4\EditDistance.cs" />
+    <Compile Include="Week4\Knapsack.cs" />
+    <Compile Include="Week5\MinimumSpanningTree.cs" />
+    <Compile Include="Week5\ShortestPathProblem.cs" />
+    <Compile Include="Week5\GetConnected.cs" />
+    <Compile Include="Week6\NQueens.cs" />
+    <Compile Include="Week6\NRooks.cs" />
+    <Compile Include="Week6\NaiveSubsetSum.cs" />
+    <Compile Include="Week6\NextPermutation.cs" />
+    <Compile Include="Week6\ShortestRoadTrip.cs" />
+    <Compile Include="Week7\LineSegmentTurning.cs" />
+    <Compile Include="Week7\LineSegmentIntersection.cs" />
+    <Compile Include="Week7\ConvexHull.cs" />
+    <Compile Include="Week8\Spreadsheet.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
