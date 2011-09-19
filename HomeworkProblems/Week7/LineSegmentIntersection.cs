@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
-namespace HomeworkProblems
+namespace HomeworkProblems.Week7.LSI
 {
     /// <summary>
     /// Rod Howarth - n6294685
@@ -13,6 +12,8 @@ namespace HomeworkProblems
     {
         private static void Main(string[] args)
         {
+            int caseCount = 1;
+
             while (true)
             {
                 bool first = true;
@@ -36,103 +37,117 @@ namespace HomeworkProblems
                     Point point2 = new Point() { X = ints[2], Y = ints[3] };
 
                     //construct the line
-                    Line currentLine = new Line() { Point1 = point1, Point2 = point2 };
+                    Line currentLine = new Line() { StartPoint = point1, EndPoint = point2 };
                     lines.Add(currentLine);
                 }
 
                 //got all the lines
-                CalculateCorners(lines);
+                var points = CalculateCorners(lines);
 
+                Console.WriteLine("Test Case {0}:", caseCount);
+                Console.WriteLine("{0} corners", points.Count);
+                foreach (var item in points.OrderBy(x => x.X).ThenBy(x => x.Y).Distinct())
+                {
+                    Console.WriteLine("{0:0.00} {1:0.00}", item.X, item.Y);
+                }
+                caseCount++;
             }
         }
 
-        public static void CalculateCorners(IList<Line> lines)
+
+        private static IList<Point> CalculateCorners(IList<Line> lines)
         {
+            //all cordners added here
             IList<Point> corners = new List<Point>();
+            //only corners that are in corners twice get added here, as it checks both ways.
+            IList<Point> finalCorners = new List<Point>();
             foreach (Line line1 in lines)
             {
                 foreach (Line line2 in lines)
                 {
                     if (line2 == line1)
                         continue;
-
                     //see if they intersect
                     Point intersectPoint = GetIntersectionPoint(line1, line2);
-                    if (intersectPoint != null)
+                    if (intersectPoint != null)//&& !corners.Contains(intersectPoint))
+                    {
+                        if (corners.Contains(intersectPoint))
+                            finalCorners.Add(intersectPoint);
                         corners.Add(intersectPoint);
+                    }
                 }
             }
+
+            return finalCorners;
         }
 
-        public static Point GetIntersectionPoint(Line line1, Line line2)
+        private static Point GetIntersectionPoint(Line line1, Line line2)
         {
             //Vector along 1 segment
-            int v0X = line2.Point2.X - line2.Point1.X;
-            int v0Y = line2.Point2.Y - line2.Point1.Y;
-
+            double v0X = line2.EndPoint.X - line2.StartPoint.X;
+            double v0Y = line2.EndPoint.Y - line2.StartPoint.Y;
 
             //Vector from base of Line 2 to Start of Line1
-            int v1X = line2.Point1.X - line1.Point1.X;
-            int v1Y = line2.Point2.Y - line1.Point1.Y;
-
+            double v1X = line2.EndPoint.X - line1.StartPoint.X;
+            double v1Y = line2.EndPoint.Y - line1.StartPoint.Y;
 
             //Vector from base of Line 2 to End of Line1
-            int v2X = line2.Point1.X - line1.Point2.X;
-            int v2Y = line2.Point2.Y - line1.Point2.Y;
+            double v2X = line2.StartPoint.X - line1.EndPoint.X;
+            double v2Y = line2.StartPoint.Y - line1.EndPoint.Y;
 
-            int crossA = (v0X * v1Y) - (v1X * v0Y);
-            int crossB = (v0X * v2Y) - (v2X * v0Y);
+            double crossA = (v0X * v1Y) - (v1X * v0Y);
+            double crossB = (v0X * v2Y) - (v2X * v0Y);
 
-            if ((crossA > 0 && crossB > 0) || (crossA < 0 && crossB < 0))
-            {
-                //no intersection
-            } else
+            bool isIntersection = !((crossA > 0 && crossB > 0) || (crossA < 0 && crossB < 0));
+            if (isIntersection)
             {
                 //there is an interseection, find the coordinates
+                var x1 = line1.StartPoint.X;
+                var x2 = line1.EndPoint.X;
+                var y1 = line1.StartPoint.Y;
+                var y2 = line1.EndPoint.Y;
 
-                var x1 = line1.Point1.X;
-                var x2 = line1.Point2.X;
-                var x3 = line2.Point1.X;
-                var x4 = line2.Point2.X;
-                var y1 = line1.Point1.Y;
-                var y2 = line1.Point2.Y;
-                var y3 = line2.Point1.Y;
-                var y4 = line2.Point2.Y;
+                var y3 = line2.StartPoint.Y;
+                var y4 = line2.EndPoint.Y;
+                var x3 = line2.StartPoint.X;
+                var x4 = line2.EndPoint.X;
 
-                var top = x4 - x2 - ((x4 - x3)*(y4 - y2)/(y4 - y3));
-                var bottom = x1 - x2 - ((x4 - x3)*(y1 - y2)/y4 - y3);
-                var alpha = top/bottom;
+                //find alpha
+                var top = x4 - x2 - (((x4 - x3) * (y4 - y2)) / (y4 - y3));
+                var bottom = x1 - x2 - (((x4 - x3) * (y1 - y2)) / (y4 - y3));
+                var alpha = top / bottom;
 
+                //plug it into slide 3
+                var xInt = (alpha * x1) + (1 - alpha) * x2;
+                var yInt = (alpha * y1) + (1 - alpha) * y2;
 
-                //Line 1
-                var line1vecO = line1;
-                var line1vecD = new Point() { X = line1.Point2.X - line1.Point1.X, Y = line1.Point2.Y - line1.Point1.Y };
-                var line1vecNormal = new Point() { X = -line1vecD.Y, Y = line1vecD.X };
-
-                var line1k = line1.Point1.X * line1vecNormal.X + line1.Point1.Y * line1vecNormal.Y;
-
-                //Line 1
-                var line2vecO = line2;
-                var line2vecD = new Point() { X = line2.Point2.X - line2.Point1.X, Y = line2.Point2.Y - line2.Point1.Y };
-                var line2vecNormal = new Point() { X = -line2vecD.Y, Y = line2vecD.X };
-
-                var line2k = line2.Point1.X * line2vecNormal.X + line2.Point1.Y * line2vecNormal.Y;
-
-
+                return new Point() { X = xInt, Y = yInt };
 
             }
             return null;
         }
 
-        public class Line
+        
+        private class Line
         {
-            public Point Point1;
-            public Point Point2;
+            public Point StartPoint;
+            public Point EndPoint;
         }
-        public class Point
+
+        public class Point : IEquatable<Point>
         {
-            public int X;
-            public int Y;
+            public double X;
+            public double Y;
+
+            #region IEquatable<Point> Members
+
+            public bool Equals(Point other)
+            {
+                double EPSILON = 0.00000001;
+                return Math.Abs(X - other.X) < EPSILON && Math.Abs(Y - other.Y) < EPSILON;
+            }
+
+            #endregion
         }
 
         #region Utils

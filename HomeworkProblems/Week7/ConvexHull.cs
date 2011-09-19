@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace HomeworkProblems
+namespace HomeworkProblems.ConvexHull
 {
     /// <summary>
     /// Rod Howarth - n6294685
@@ -27,7 +27,25 @@ namespace HomeworkProblems
                     plants.Add(new Point(input[0], input[1]));
                 }
 
-                plants.FindConvexHull();
+                var outline = plants.FindConvexHull();
+
+                double totalLength = 0;
+                for (int i = 0; i < outline.Count; i++)
+                {
+
+
+                    if (i == outline.Count - 1)
+                    {
+                        totalLength += outline[i].LengthTo(outline[0]);
+                    }
+                    else
+                    {
+                        totalLength += outline[i].LengthTo(outline[i + 1]);
+                    }
+                }
+
+                var cost = totalLength*5 + outline.Count;
+                Console.WriteLine("${0:0.00}", cost);
             }
         }
     }
@@ -51,9 +69,7 @@ namespace HomeworkProblems
                 }
             }
 
-            var pointsFromZero = new SortedDictionary<double, Point>();
-
-            Console.WriteLine("({0},{1})", min.X, min.Y);
+            var vectorsFromZero = new SortedDictionary<double, Vector>();
 
             foreach (var point in points)
             {
@@ -62,31 +78,27 @@ namespace HomeworkProblems
                 var angle = vector.AngleTo(new Vector(min.X + 4, min.Y));
 
 
-                if (pointsFromZero.ContainsKey(angle))
+                if (vectorsFromZero.ContainsKey(angle))
                 {
                     var currentLength = min.LengthTo(point);
-                    var compareLength = min.LengthTo(new Point(pointsFromZero[angle].X, pointsFromZero[angle].Y));
+                    var compareLength = min.LengthTo(new Point(vectorsFromZero[angle].X, vectorsFromZero[angle].Y));
 
                     if (currentLength > compareLength)
                     {
-                        pointsFromZero[angle] = point;
+                        vectorsFromZero[angle] = vector;
                     }
                 }
                 else
                 {
-                    pointsFromZero.Add(angle, point);
+                    vectorsFromZero.Add(angle, vector);
                 }
-                Console.WriteLine("{0}: {1} ", angle, vector);
             }
 
-            var sortedPoints = pointsFromZero.Values.ToList();
+            var sortedVectors = vectorsFromZero.Values.ToList();
 
-            //Add min vector
-            sortedPoints.Insert(0, new Point(0, 0));
+            var stack = new Stack<Vector>(sortedVectors.Take(3));
 
-            var stack = new Stack<Point>(sortedPoints.Take(3));
-
-            for (int i = 3; i < sortedPoints.Count; i++)
+            for (int i = 3; i < sortedVectors.Count; i++)
             {
                 //if(i == sortedVectors.Count-1)
                 //{
@@ -99,45 +111,45 @@ namespace HomeworkProblems
                 {
                     var topOfStack = stack.Pop();
                     var secondFromTop = stack.Peek();
-                    stack.Push(topOfStack);
+                  
 
                     var first = secondFromTop.VectorTo(topOfStack);
-                    var second = topOfStack.VectorTo(sortedPoints[i]);
+                    var second = topOfStack.VectorTo(sortedVectors[i]);
 
-                    Console.WriteLine(first.IsRightTurnInto(second));
-
-                    if (first.IsRightTurnInto(second))
+                    bool isRightTurn = IsRightTurn(secondFromTop, topOfStack, sortedVectors[i]);
+                    if (!isRightTurn)
                     {
-                        stack.Pop();
-                    }
-                    else
-                    {
+                        stack.Push(topOfStack);
                         break;
                     }
+
                 }
 
-                stack.Push(sortedPoints[i]);
+                stack.Push(sortedVectors[i]);
 
             }
 
             return stack.Select(x => new Point(x.X, x.Y)).ToList();
         }
 
-        public static bool IsRightTurnInto(this Vector first, Vector second)
+        public static bool IsRightTurn(Vector start, Vector cornerPoint, Vector endPoint)
         {
-            if (first.AngleTo(second) > Math.PI)
-            {
-                //is left turn
-                return false;
-            }
-            else
-            {
-                //right turn
-                return true;
-            }
+            //p2-p1
+            int v2X = endPoint.X - cornerPoint.X;
+            int v2Y = endPoint.Y - cornerPoint.Y;
+
+            //p1 -p0
+            int v1x = cornerPoint.X - start.X;
+            int v1y = cornerPoint.Y - start.Y;
 
 
+            //calculate signed area
+            int cross = (v1x * v2Y) - (v2X * v1y);
+            if (cross == 0)
+                return true;//straight is a non left turn
 
+            //positive means right turn
+            return cross < 0;
         }
 
         public static double LengthTo(this Point from, Point to)
@@ -187,7 +199,7 @@ namespace HomeworkProblems
 
         public override string ToString()
         {
-            return String.Format("({0},{1})", X, Y);
+            return String.Format("({0},{1})",X,Y);
         }
     }
 

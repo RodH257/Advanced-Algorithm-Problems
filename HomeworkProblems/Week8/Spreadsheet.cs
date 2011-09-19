@@ -13,7 +13,6 @@ namespace HomeworkProblems
     {
         private static void Main(string[] args)
         {
-
             int numTestCases = int.Parse(Console.ReadLine());
 
             for (int testCaseNum = 0; testCaseNum < numTestCases; testCaseNum++)
@@ -95,29 +94,12 @@ namespace HomeworkProblems
             }
 
             //now in topological order, get the references filled out
-
-
             while (nodeStack.Count != 0)
             {
                 Node currentNode = nodeStack.Pop();
                 currentNode.GetComputedValue();
             }
         }
-
-
-        //        // Recursive version of DFS
-        //DFS(Node v, Stack s)
-        //  mark v as discovered
-        //  for each node n adjacent to v do
-        //    if n is not discovered
-        //      DFS(n,s)
-        //    else if n is not processed
-        //      cycle detected – NOT a DAG
-        //    endif
-        //  endfor
-        //  mark v as processed
-        //  add v to stack s
-
         private static bool notComputable;
 
         private static void DepthFirstSearch(Node node, Stack<Node> nodeStack)
