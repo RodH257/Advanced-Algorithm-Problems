@@ -1,0 +1,2 @@
+Test 1: Maximum cardinality = 6
+Test 2: Maximum cardinality = 1

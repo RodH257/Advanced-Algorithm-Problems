@@ -9,7 +9,7 @@ namespace HomeworkProblems
     /// Rod Howarth - n6294685
     /// Team14
     /// </summary>
-    public class Template
+    public class Money
     {
         private static void Main(string[] args)
         {
@@ -47,4 +47,25 @@ namespace HomeworkProblems
         #endregion
     }
 }
+
+
+
+//Notes:
+/*
+ * Money - augmenting/bipartite or something.
+ * 
+ * Anti Brute Force Lock - permutations with extra logic
+ * 
+ * Royal Access - a star or something?
+ * 
+ * May the Right-Force be with you - 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ */
 

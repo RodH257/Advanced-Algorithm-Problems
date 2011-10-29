@@ -1,0 +1,11 @@
+2 3
+1 1
+1 1
+Volunteer Smith 20 10
+Adolescent Paul 20 30
+Adolescent Peter 30 30
+Volunteer Kevin 20 40
+Volunteer Peter 50 10
+Adolescent John 10 20
+0 0
+

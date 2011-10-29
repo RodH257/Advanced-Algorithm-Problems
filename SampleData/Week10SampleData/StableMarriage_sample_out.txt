@@ -1,0 +1,4 @@
+Case 1:
+Man 0 marries Woman 0
+Man 1 marries Woman 2
+Man 2 marries Woman 1

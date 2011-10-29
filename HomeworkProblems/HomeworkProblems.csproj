@@ -34,7 +34,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>HomeworkProblems.ChannelAllocation</StartupObject>
+    <StartupObject>HomeworkProblems.TravellingSalesman</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -77,6 +77,14 @@
     <Compile Include="Week7\ConvexHull.cs" />
     <Compile Include="Week8\Spreadsheet.cs" />
     <Compile Include="Week8\ChannelAllocation.cs" />
+    <Compile Include="Week9\MaximumCardinalityBipartiteMatching.cs" />
+    <Compile Include="Week9\Taxi.cs" />
+    <Compile Include="Weekx10\MaximumFlow.cs" />
+    <Compile Include="Weekx10\StableMarriage.cs" />
+    <Compile Include="Weekx10\MentoringAssignment.cs" />
+    <Compile Include="Weekx11\MinCostMaxFlow.cs" />
+    <Compile Include="Weekx11\TravellingSalesman.cs" />
+    <Compile Include="Weekx13\Money.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

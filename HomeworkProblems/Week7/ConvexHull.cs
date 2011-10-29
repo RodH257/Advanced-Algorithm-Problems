@@ -13,80 +13,69 @@ namespace HomeworkProblems.ConvexHull
     {
         public static void Main(string[] args)
         {
-            var numCases = int.Parse(Console.ReadLine());
+            //get number of test case
+            var numCases = Int32.Parse(Console.ReadLine());
 
-            for (int c = 0; c < numCases; c++)
+            for (int testCaseNum = 0; testCaseNum < numCases; testCaseNum++)
             {
-                var numPlants = int.Parse(Console.ReadLine());
+                int numPlants = Int32.Parse(Console.ReadLine());
 
-                var plants = new List<Point>();
+                List<Point> plantLocations = new List<Point>();
                 for (int plant = 0; plant < numPlants; plant++)
                 {
-                    var input = Console.ReadLine().Split(' ').Select(x => int.Parse(x)).ToList();
-
-                    plants.Add(new Point(input[0], input[1]));
+                    var splitInts = GetSplitInts(Console.ReadLine());
+                    //add x y
+                    plantLocations.Add(new Point(splitInts[0], splitInts[1]));
                 }
 
-                var outline = plants.FindConvexHull();
+
+                List<Point> hull = FindConvexHull(plantLocations);
 
                 double totalLength = 0;
-                for (int i = 0; i < outline.Count; i++)
+                for (int i = 0; i < hull.Count; i++)
                 {
-
-
-                    if (i == outline.Count - 1)
-                    {
-                        totalLength += outline[i].LengthTo(outline[0]);
-                    }
+                    if (i == hull.Count - 1)
+                        totalLength += hull[i].LengthTo(hull[0]);
                     else
-                    {
-                        totalLength += outline[i].LengthTo(outline[i + 1]);
-                    }
+                        totalLength += hull[i].LengthTo(hull[i + 1]);
                 }
 
-                var cost = totalLength*5 + outline.Count;
+                var cost = totalLength * 5 + hull.Count;
                 Console.WriteLine("${0:0.00}", cost);
             }
         }
-    }
 
-    static class Utils
-    {
-        public static List<Point> FindConvexHull(this List<Point> points)
+        public static List<Point> FindConvexHull(List<Point> points)
         {
-            var min = new Point(int.MaxValue, int.MaxValue);
+            Point min = new Point(int.MaxValue, int.MaxValue);
 
             //Find bottom left point
             foreach (var point in points)
             {
                 if (point.Y < min.Y)
-                {
                     min = point;
-                }
                 else if (point.Y == min.Y && point.X < min.X)
-                {
                     min = point;
-                }
             }
 
             var vectorsFromZero = new SortedDictionary<double, Vector>();
 
             foreach (var point in points)
             {
-                var vector = min.VectorTo(point);
-                //Gets angle to y = 0
-                var angle = vector.AngleTo(new Vector(min.X + 4, min.Y));
+                //get the vector from the starting poitn (minimum), to current point 
+                var vector = Vector.VectorBetween(min, point);
 
+                //Gets angle to y = 0
+                var angle = vector.AngleTo(new Vector(min.X +4, min.Y));
 
                 if (vectorsFromZero.ContainsKey(angle))
                 {
+                    //we only want to add the one poitn in there, the furtherest away.
                     var currentLength = min.LengthTo(point);
                     var compareLength = min.LengthTo(new Point(vectorsFromZero[angle].X, vectorsFromZero[angle].Y));
 
                     if (currentLength > compareLength)
-                    {
                         vectorsFromZero[angle] = vector;
-                    }
                 }
                 else
                 {
@@ -94,140 +83,139 @@ namespace HomeworkProblems.ConvexHull
                 }
             }
 
-            var sortedVectors = vectorsFromZero.Values.ToList();
-
-            var stack = new Stack<Vector>(sortedVectors.Take(3));
+            List<Vector> sortedVectors = vectorsFromZero.Values.ToList();
+            Stack<Vector> stack = new Stack<Vector>(sortedVectors.Take(3));
 
             for (int i = 3; i < sortedVectors.Count; i++)
             {
-                //if(i == sortedVectors.Count-1)
-                //{
-                //    var newStack = stack.ToList();
-
-                //    stack = new Stack<Vector>();
-                //}
-
                 while (true)
                 {
-                    var topOfStack = stack.Pop();
-                    var secondFromTop = stack.Peek();
-                  
+                    Vector cornerPoint = stack.Pop();
+                    //stack is one less so we can just peek
+                    Vector startPoint = stack.Peek();
+                    Vector endPoint = sortedVectors[i];
+                    //pretend the vectors are points, and get the vector between those oitns
+                    //first vector will be from the start to the corner
+                    Vector firstLine = Vector.VectorBetween(startPoint, cornerPoint);
+                    //from the corner to next point 
+                    Vector secondLine = Vector.VectorBetween(cornerPoint, endPoint);
 
-                    var first = secondFromTop.VectorTo(topOfStack);
-                    var second = topOfStack.VectorTo(sortedVectors[i]);
-
-                    bool isRightTurn = IsRightTurn(secondFromTop, topOfStack, sortedVectors[i]);
+                    bool isRightTurn = IsNonLeftTurn(firstLine, secondLine);
                     if (!isRightTurn)
                     {
-                        stack.Push(topOfStack);
+                        //put the top one bac kon
+                        stack.Push(cornerPoint);
                         break;
                     }
-
+                    //effectively popping here
                 }
-
                 stack.Push(sortedVectors[i]);
-
             }
 
-            return stack.Select(x => new Point(x.X, x.Y)).ToList();
+            //we only need to know the lengths, so no need to convert the vector points back into proper points to 0.
+            return stack.Cast<Point>().ToList();
         }
 
-        public static bool IsRightTurn(Vector start, Vector cornerPoint, Vector endPoint)
+        public static bool IsNonLeftTurn(Vector firstLine, Vector secondLine)
         {
-            //p2-p1
-            int v2X = endPoint.X - cornerPoint.X;
-            int v2Y = endPoint.Y - cornerPoint.Y;
-
-            //p1 -p0
-            int v1x = cornerPoint.X - start.X;
-            int v1y = cornerPoint.Y - start.Y;
-
-
             //calculate signed area
-            int cross = (v1x * v2Y) - (v2X * v1y);
+            int cross = (firstLine.X * secondLine.Y) - (secondLine.X * firstLine.Y);
             if (cross == 0)
-                return true;//straight is a non left turn
+                return true;//straight
 
             //positive means right turn
             return cross < 0;
         }
 
-        public static double LengthTo(this Point from, Point to)
+        public class Point
         {
-            return Math.Sqrt(Math.Pow(to.X - from.X, 2) + Math.Pow(to.Y - from.Y, 2));
+            public int X { get; set; }
+            public int Y { get; set; }
+
+            public Point(int x, int y)
+            {
+                X = x;
+                Y = y;
+            }
+
+            public override string ToString()
+            {
+                return String.Format("({0},{1})", X, Y);
+            }
+
+            /// <summary>
+            /// Gets the length from this point to another point 
+            /// </summary>
+            public double LengthTo(Point to)
+            {
+                return Math.Sqrt(Math.Pow(to.X - this.X, 2) + Math.Pow(to.Y - this.Y, 2));
+            }
         }
 
-        public static Vector VectorTo(this Point from, Point to)
+        public class Vector: Point
         {
-            return new Vector(to.X - from.X, to.Y - from.Y);
+            public Vector(int x, int y) : base(x, y)
+            {
+            }
+
+            public double Length
+            {
+                get { return Math.Sqrt(Math.Pow(X, 2) + Math.Pow(Y, 2)); }
+            }
+
+            public override string ToString()
+            {
+                return String.Format("({0},{1})", X, Y);
+            }
+
+            public static Vector VectorBetween(Point from, Point to)
+            {
+                return new Vector(to.X - from.X, to.Y - from.Y);
+            }
+
+            public double AngleTo(Vector v2)
+            {
+                var dotProd = (this.X * v2.X) + (this.Y * v2.Y);
+                var length = this.Length * v2.Length;
+
+                double EPSILON = 0.00000001;
+                if (Math.Abs(length - 0) < EPSILON)
+                    return 0;
+
+                var angle = Math.Acos(dotProd / length);
+                return angle;
+            }
+
         }
 
-        public static Vector VectorTo(this Vector from, Vector to)
+
+
+        #region Utils
+        public static int ReadInt()
         {
-            return new Vector(to.X - from.X, to.Y - from.Y);
+            string line = Console.ReadLine();
+            return Int32.Parse(line);
         }
 
-        public static double AngleTo(this Vector v1, Vector v2)
+        public static int[] GetSplitInts(string input)
         {
-            var dotProd = (v1.X * v2.X) + (v1.Y * v2.Y);
-            var length = v1.Length * v2.Length;
-
-            if (length == 0)
-                return 0;
-
-            var angle = Math.Acos(dotProd / length);
-
-            return angle;
+            string[] intStrings = input.Split(' ');
+            int[] splitInts = new int[intStrings.Length];
+            for (int i = 0; i < intStrings.Length; i++)
+                splitInts[i] = Int32.Parse(intStrings[i]);
+            return splitInts;
         }
+
+        public static int[] GetSplitInts()
+        {
+            string[] intStrings = Console.ReadLine().Split(' ');
+            int[] splitInts = new int[intStrings.Length];
+            for (int i = 0; i < intStrings.Length; i++)
+                splitInts[i] = Int32.Parse(intStrings[i]);
+            return splitInts;
+        }
+        #endregion
     }
 
-    class Point
-    {
-        public Point(int x, int y)
-        {
-            X = x;
-            Y = y;
-        }
-
-        public static Point Empty()
-        {
-            return new Point(0, 0);
-        }
-
-        public int X { get; set; }
-        public int Y { get; set; }
-
-        public override string ToString()
-        {
-            return String.Format("({0},{1})",X,Y);
-        }
-    }
-
-    class Vector
-    {
-        public Vector(int x, int y)
-        {
-            X = x;
-            Y = y;
-        }
-
-        public static Vector Empty()
-        {
-            return new Vector(0, 0);
-        }
-
-        public int X { get; set; }
-        public int Y { get; set; }
-        
-        public double Length
-        {
-            get { return Math.Sqrt(Math.Pow(X, 2) + Math.Pow(Y, 2)); }
-        }
-
-        public override string ToString()
-        {
-            return string.Format("({0},{1})", X, Y);
-        }
-    }
 }
 

@@ -1,0 +1,2 @@
+Test 1: Minimum Cost = 10
+Test 2: Minimum Cost = 13
