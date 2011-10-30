@@ -34,7 +34,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>HomeworkProblems.TravellingSalesman</StartupObject>
+    <StartupObject>HomeworkProblems.DNAMatcher</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -84,6 +84,7 @@
     <Compile Include="Weekx10\MentoringAssignment.cs" />
     <Compile Include="Weekx11\MinCostMaxFlow.cs" />
     <Compile Include="Weekx11\TravellingSalesman.cs" />
+    <Compile Include="Weekx12\DNAMatcher.cs" />
     <Compile Include="Weekx13\Money.cs" />
   </ItemGroup>
   <ItemGroup />

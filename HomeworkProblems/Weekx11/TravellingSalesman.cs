@@ -42,36 +42,74 @@ namespace HomeworkProblems
                     {
                         //work out euclidean distance
                         double weight = GetEucDistance(nodes[nodeNum], nodes[otherCity]);
-
                         Edge edge = new Edge() { Source = nodes[nodeNum], Destination = nodes[otherCity] };
                         edge.Weight = weight;
+           
                         nodes[nodeNum].Edges.Add(edge);
                     }
                 }
 
                 Console.Write("{0}: ", testCaseNum);
-                //get the minimum spanning tree and its weight
-                double totalWeight = GetMinimumSpanningTreeWeightWithRTS(nodes, numPoints);
+                //get the minimum spanning tree 
+                GetMinimumSpanningTree(nodes, numPoints);
 
-                Node currentNode = nodes[0];
-                bool first = true;
-                while (true)
-                {
-                    Console.Write(currentNode.NodeNumber + " ");
-
-                    //if its the second time we've reached home, stop here
-                    if (currentNode == nodes[0] && !first)
-                        break;
-
-                    first = false;
-                    currentNode = currentNode.NextNodeInTree;
-                }
-
+                //get path via DFS
+                double totalWeight = DepthFirstOutputAndGetWeight(nodes, numPoints);
                 //round it up as per example.
                 totalWeight = Math.Ceiling(totalWeight);
 
-                Console.WriteLine("= {0,0}",totalWeight);
+                Console.WriteLine("= {0,0}", totalWeight);
             }
+        }
+
+
+        private static double DepthFirstOutputAndGetWeight(Node[] graphNodes, int n)
+        {
+            Stack<Node> nodes = new Stack<Node>();
+            nodes.Push(graphNodes[0]);
+            bool[] visitedNodes = new bool[n];
+
+            double totalWeight = 0;
+
+            Node lastNode = graphNodes[0];
+            while (nodes.Count != 0)
+            {
+                Node currentNode = nodes.Pop();
+                visitedNodes[currentNode.NodeNumber] = true;
+
+                //do calculations
+                Console.Write(currentNode.NodeNumber + " ");
+
+                lastNode = currentNode;
+
+                //look at edges from current node to others
+                foreach (Edge edge in currentNode.TreeEdges)
+                {
+                    //check its not already visited
+                    if (visitedNodes[edge.Destination.NodeNumber])
+                        continue;
+
+                    if (!nodes.Contains(edge.Destination))
+                    {
+                        nodes.Push(edge.Destination);
+                        totalWeight += edge.Weight;
+                    }
+                }
+
+            }
+
+            //add the last source
+            foreach (Edge edge in lastNode.Edges)
+            {
+                if (edge.Destination == graphNodes[0])
+                {
+                    totalWeight += edge.Weight;
+                    Console.Write(graphNodes[0].NodeNumber + " ");
+                }
+            }
+
+            return totalWeight;
+
         }
 
         static double GetEucDistance(Node start, Node destination)
@@ -84,12 +122,11 @@ namespace HomeworkProblems
         private class Node
         {
             public List<Edge> Edges = new List<Edge>();
-            public int NodeNumber = 0;
+            public int NodeNumber;
             public int X;
             public int Y;
             public bool IsInTree = false;
-            public Node NextNodeInTree = null;
-            public Edge EdgeToNextNode = null;
+            public List<Edge> TreeEdges = new List<Edge>();
         }
 
         private class Edge
@@ -102,7 +139,7 @@ namespace HomeworkProblems
         /// <summary>
         /// Modified to return to start
         /// </summary>
-        private static double GetMinimumSpanningTreeWeightWithRTS(Node[] nodes, int n)
+        private static void GetMinimumSpanningTree(Node[] nodes, int n)
         {
             Node startNode = nodes[0];
             startNode.IsInTree = true;
@@ -112,54 +149,43 @@ namespace HomeworkProblems
                 queue.Enqueue(edge.Weight, edge);
 
             int numberInTree = 0;
-            double totalWeight = 0;
-
-            Node lastNode = startNode;
             while (!queue.IsEmpty && numberInTree != n)
             {
                 Edge currentEdge = queue.Dequeue();
                 Node nodeToAdd = null;
+                Node parentNode = null;
                 if (currentEdge.Source.IsInTree && currentEdge.Destination.IsInTree)
                     //all in tree, continue
                     continue;
                 if (currentEdge.Source.IsInTree)
+                {
+
                     //source is in tree but not dest
                     nodeToAdd = currentEdge.Destination;
+                    parentNode = currentEdge.Source;
+
+                }
                 else if (currentEdge.Destination.IsInTree)
+                {
                     //dest is in tree but not source
                     nodeToAdd = currentEdge.Source;
+                    parentNode = currentEdge.Destination;
+                }
                 else
                     continue; //neither in there
 
                 nodeToAdd.IsInTree = true;
-                totalWeight += currentEdge.Weight;
                 numberInTree++;
 
+                //construct the spanning tree
+                //create an edge from the node in the tree to the new one 
+                Edge treeEdge = new Edge() { Source = parentNode, Destination = nodeToAdd, Weight = currentEdge.Weight };
 
-                //set the path
-                lastNode.NextNodeInTree = nodeToAdd;
-                lastNode.EdgeToNextNode = currentEdge;
-
-                lastNode = nodeToAdd;
+                parentNode.TreeEdges.Add(treeEdge);
 
                 foreach (Edge edge in nodeToAdd.Edges)
                     queue.Enqueue(edge.Weight, edge);
             }
-
-            lastNode.NextNodeInTree = startNode;
-
-            //add return to start weight
-            foreach (Edge edge in lastNode.Edges)
-            {
-                if (edge.Destination == startNode)
-                {
-                    totalWeight += edge.Weight;
-                    lastNode.EdgeToNextNode = edge;
-                    break;
-                }
-            }
-
-            return totalWeight;
         }
 
         class PriorityQueue<P, V>
