@@ -19,58 +19,77 @@ namespace HomeworkProblems
                 string firstString = Console.ReadLine();
                 string secondString = Console.ReadLine();
 
-                SuffixTree tree = new SuffixTree(firstString);
+                SuffixTree tree = new SuffixTree();
+                tree.ConstructTree(firstString + "$", 1);
+                tree.ConstructTree(secondString + "@", 2);
+                string longestSubstring = tree.FindLongestCommonSubstring("$", "@");
+                //  tree.root.Output();
 
-               tree.root.Output();
-
-                ////find the longest common substring
-
-
-
+                //find the longest common substring
+                Console.WriteLine("Test {0}: {1}-{2}", testCaseNum, longestSubstring.Length, longestSubstring);
             }
         }
 
 
         public class SuffixTree
         {
-            public string text;
             public TreeNode root;
 
-            public SuffixTree(string text)
+            public SuffixTree()
             {
                 this.root = new TreeNode();
-
-                if (text.Length > 0 && text[text.Length - 1] == '$')
-                    this.text = text;
-                else
-                    this.text = text + "$";
-
-                ConstructTree();
             }
 
-            public void ConstructTree(string text)
+            public void ConstructTree(string text, int stringNumber)
             {
-                
-            }
-
-
-            private void ConstructTree()
-            {
-                
-
-                for (int i = 0; i < this.text.Length; i++)
+                for (int i = 0; i < text.Length; i++)
                 {
                     //create a list of all suffixes from this letter on
                     //this list will be dwindled
                     List<String> suffixList = new List<String>();
-                    for (int k = i; k < this.text.Length; k++)
+                    for (int k = i; k < text.Length; k++)
                     {
-                        suffixList.Add(this.text[k] + "");
+                        suffixList.Add(text[k] + "");
                     }
-                    this.root.AddSuffix(suffixList, i + 1);
+                    this.root.AddSuffix(suffixList, stringNumber);
                 }
             }
 
+            private TreeNode deepestCommonNode;
+            //find the longest substring that ends in both ending1 and ending2
+            public string FindLongestCommonSubstring(string ending1, string ending2)
+            {
+                //find the deepest node that has both ending1 and ending2 in its children
+                deepestCommonNode = root;
+
+                Traverse(root);
+
+                TreeNode currentNode = deepestCommonNode;
+                string output = "";
+                while (currentNode != root)
+                {
+                    output = currentNode.Value + output;
+                    currentNode = currentNode.parent;
+                }
+
+                return output;
+            }
+
+          
+            public void Traverse(TreeNode parent)
+            {
+                foreach (TreeNode child in parent.Children)
+                {
+                    //calculate string coverage
+                    if (child.BelongsToStrings.Count == 2)
+                    {
+                        if (child.stringDepth > deepestCommonNode.nodeDepth)
+                            deepestCommonNode = child;
+
+                        Traverse(child);
+                    }
+                }
+            }
         }
 
         public class TreeNode
@@ -79,45 +98,55 @@ namespace HomeworkProblems
             public int nodeDepth;
             public IList<TreeNode> Children = new List<TreeNode>();
             public TreeNode parent;
+            public HashSet<int> BelongsToStrings = new HashSet<int>();
             public int stringDepth;
 
-            public TreeNode(TreeNode parent, string incomingLabel, int depth, int label)
+            public TreeNode(TreeNode parent, string incomingLabel, int depth, int stringNumber)
             {
                 this.Value = incomingLabel;
                 this.nodeDepth = depth;
                 this.parent = parent;
                 this.stringDepth = parent.stringDepth + incomingLabel.Length;
-            }
-            public TreeNode(){}
 
-            public void AddSuffix(List<string> suffix, int pathIndex)
+                //mark it as belonging to a certain string
+                this.BelongsToStrings.Add(stringNumber);
+            }
+            public TreeNode() { }
+
+            public void AddSuffix(List<string> suffix, int stringNumber)
             {
-                TreeNode insertAt = this;
-                insertAt = Search(this, suffix);
-                Insert(insertAt, suffix, pathIndex);
+       
+                //find position to insert at 
+                TreeNode insertAt = Search(this, suffix, stringNumber);
+                Insert(insertAt, suffix, stringNumber);
             }
 
-            public TreeNode Search(TreeNode startNode, List<string> suffix)
+            public TreeNode Search(TreeNode startNode, List<string> suffix, int stringNumber)
             {
                 foreach (TreeNode child in startNode.Children)
                 {
                     if (child.Value.Equals(suffix[0]))
                     {
+                        //its already there 
+                        //check that its belonging to this string number
+                        if (!child.BelongsToStrings.Contains(stringNumber))
+                            child.BelongsToStrings.Add(stringNumber);
+
                         suffix.RemoveAt(0);
                         if (suffix.Count == 0)
                             return child;
 
-                        return Search(child, suffix);
+                        return Search(child, suffix, stringNumber);
                     }
                 }
                 return startNode;
             }
 
-            private void Insert(TreeNode insertAt, List<string> suffix, int pathIndex)
+            private void Insert(TreeNode insertAt, List<string> suffix, int stringNumber)
             {
                 foreach (string x in suffix)
                 {
-                    TreeNode child = new TreeNode(insertAt, x, insertAt.nodeDepth + 1, pathIndex);
+                    TreeNode child = new TreeNode(insertAt, x, insertAt.nodeDepth + 1, stringNumber);
                     insertAt.Children.Add(child);
                     insertAt = child;
                 }
@@ -130,7 +159,13 @@ namespace HomeworkProblems
                     output += " ";
 
                 if (!string.IsNullOrEmpty(this.Value))
-                    output += this.Value;
+                {
+                    output += this.Value + " strings  ";
+                    foreach (int stringNumber in this.BelongsToStrings)
+                    {
+                        output += stringNumber + ", ";
+                    }
+                }
                 Console.Write(output);
 
                 foreach (TreeNode child in Children)
