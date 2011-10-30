@@ -68,19 +68,19 @@ namespace HomeworkProblems
             Stack<Node> nodes = new Stack<Node>();
             nodes.Push(graphNodes[0]);
             bool[] visitedNodes = new bool[n];
+            Queue<Node> nodePath = new Queue<Node>();
+           
 
-            double totalWeight = 0;
-
-            Node lastNode = graphNodes[0];
+         //   Node lastNode = graphNodes[0];
             while (nodes.Count != 0)
             {
                 Node currentNode = nodes.Pop();
                 visitedNodes[currentNode.NodeNumber] = true;
 
                 //do calculations
-                Console.Write(currentNode.NodeNumber + " ");
-
-                lastNode = currentNode;
+                //Console.Write(currentNode.NodeNumber + " ");
+                nodePath.Enqueue(currentNode);
+               // lastNode = currentNode;
 
                 //look at edges from current node to others
                 foreach (Edge edge in currentNode.TreeEdges)
@@ -92,22 +92,34 @@ namespace HomeworkProblems
                     if (!nodes.Contains(edge.Destination))
                     {
                         nodes.Push(edge.Destination);
-                        totalWeight += edge.Weight;
+                      //  totalWeight += edge.Weight;
                     }
                 }
 
             }
+            //enquie the source
+            nodePath.Enqueue(graphNodes[0]);
 
-            //add the last source
-            foreach (Edge edge in lastNode.Edges)
+
+            double totalWeight = 0;
+            Node previous = nodePath.Dequeue();
+            Console.Write(previous.NodeNumber + " ");
+            while (nodePath.Count != 0)
             {
-                if (edge.Destination == graphNodes[0])
+                Node current = nodePath.Dequeue();
+                foreach (Edge edge in previous.Edges)
                 {
-                    totalWeight += edge.Weight;
-                    Console.Write(graphNodes[0].NodeNumber + " ");
+                    if (edge.Destination.NodeNumber == current.NodeNumber)
+                    {
+                        Console.Write(current.NodeNumber + " ");
+                        totalWeight += edge.Weight;
+                        break;
+                    }
                 }
-            }
 
+                previous = current;
+            }
+         
             return totalWeight;
 
         }

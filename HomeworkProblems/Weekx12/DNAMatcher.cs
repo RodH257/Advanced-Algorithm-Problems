@@ -30,27 +30,53 @@ namespace HomeworkProblems
             }
         }
 
-
         public class SuffixTree
         {
             public TreeNode root;
-
             public SuffixTree()
             {
                 this.root = new TreeNode();
             }
 
+            /// <summary>
+            /// Constructs a tree with the supplied text 
+            /// 
+            /// Does this by looping through the string character by character
+            /// from start to end. Creates suffixes for each character from that point on 
+            /// 
+            /// ie 
+            /// SOCCER
+            /// OCCER
+            /// CCER
+            /// CER
+            /// ER
+            /// R
+            /// 
+            /// on first loop then adds those to the tree
+            /// When those are added to the tree, the tree is checked to see if they already contain those exact ones
+            /// If the first one is there, its rmeoved, adn second one is checked, this is dwindled until it gets to the last X about
+            /// that aren't already present. These are added as a subset of the current position
+            /// ie if it gets to SOCC and realises that CER isnt there it adds CER ER and R as children
+            /// 
+            /// this is repeated again with 
+            /// OCCER 
+            /// CCER
+            /// CER
+            /// ER
+            /// R
+            /// 
+            /// and so on
+            /// 
+            /// </summary>
             public void ConstructTree(string text, int stringNumber)
             {
                 for (int i = 0; i < text.Length; i++)
                 {
                     //create a list of all suffixes from this letter on
-                    //this list will be dwindled
+                    //this list will be dwindled down to only new suffixes
                     List<String> suffixList = new List<String>();
                     for (int k = i; k < text.Length; k++)
-                    {
                         suffixList.Add(text[k] + "");
-                    }
                     this.root.AddSuffix(suffixList, stringNumber);
                 }
             }
@@ -62,8 +88,8 @@ namespace HomeworkProblems
                 //find the deepest node that has both ending1 and ending2 in its children
                 deepestCommonNode = root;
 
+                //traverse the nodes to find the deepest common one
                 Traverse(root);
-
                 TreeNode currentNode = deepestCommonNode;
                 string output = "";
                 while (currentNode != root)
@@ -75,7 +101,6 @@ namespace HomeworkProblems
                 return output;
             }
 
-          
             public void Traverse(TreeNode parent)
             {
                 foreach (TreeNode child in parent.Children)
@@ -92,13 +117,17 @@ namespace HomeworkProblems
             }
         }
 
+        /// <summary>
+        /// Represents a treenode in the suffix tree
+        /// </summary>
         public class TreeNode
         {
             public string Value;
             public int nodeDepth;
             public IList<TreeNode> Children = new List<TreeNode>();
             public TreeNode parent;
-            public HashSet<int> BelongsToStrings = new HashSet<int>();
+
+            public HashSet<int> BelongsToStrings = new HashSet<int>(); //used to identify different words in the tree
             public int stringDepth;
 
             public TreeNode(TreeNode parent, string incomingLabel, int depth, int stringNumber)
@@ -115,12 +144,16 @@ namespace HomeworkProblems
 
             public void AddSuffix(List<string> suffix, int stringNumber)
             {
-       
+
                 //find position to insert at 
                 TreeNode insertAt = Search(this, suffix, stringNumber);
                 Insert(insertAt, suffix, stringNumber);
             }
 
+            /// <summary>
+            /// Searches for the node to insert the suffixes under
+            /// Dwindles down the suffix list to remove ones already inserted
+            /// </summary>
             public TreeNode Search(TreeNode startNode, List<string> suffix, int stringNumber)
             {
                 foreach (TreeNode child in startNode.Children)
@@ -142,6 +175,7 @@ namespace HomeworkProblems
                 return startNode;
             }
 
+            //Inserts the suffixes at the certain position
             private void Insert(TreeNode insertAt, List<string> suffix, int stringNumber)
             {
                 foreach (string x in suffix)
@@ -152,6 +186,9 @@ namespace HomeworkProblems
                 }
             }
 
+            /// <summary>
+            /// Outputs a pretty poor representation of the tree.
+            /// </summary>
             public void Output()
             {
                 string output = "";
@@ -176,130 +213,6 @@ namespace HomeworkProblems
             }
 
         }
-
-        //public class TreeEdge
-        //{
-        //    public String Value = null;
-
-        //    public TreeEdge(String value)
-        //    {
-        //        this.Value = value;
-        //    }
-
-        //}
-
-
-        //public class SuffixTree
-        //{
-        //    public Node Root;
-
-        //    public void ConstructTree(string text, int stringNumber)
-        //    {
-        //        Root = new Node();
-
-
-        //        List<string> suffixlist = new List<string>();
-
-        //        //setup  a list of all variations on the word 
-        //        //ie all suffixes
-        //        for (int i =0; i < text.Length; i++)
-        //        {
-        //            string newPrefix = text.Substring(i, text.Length-1);
-        //            suffixlist.Add(newPrefix);
-        //        }
-
-        //        //now merge those into a tree
-
-        //        foreach (string suffix in suffixlist)
-        //        {
-
-
-        //        }
-
-        //        //foreach (char character in text)
-        //        //{
-        //        //    List<string> suffixlist = new List<string>();
-
-        //        //    //create a suffix for every character
-        //        //    foreach (char suffixChar in text)
-        //        //    {
-        //        //        suffixlist.Add(suffixChar.ToString());
-        //        //    }
-
-        //        //    Root.AddSuffix(suffixlist);
-        //        //}
-        //    }
-        //}
-
-        //public class Node : IEquatable<Node>
-        //{
-        //    public HashSet<int> BelongsToStrings = new HashSet<int>();
-        //    public string Value;
-        //    public IList<Node> Children = new List<Node>();
-
-        //    public void AddSuffix(string suffix)
-        //    {
-        //          Node insertAt = this;
-        //          insertAt = FindNodeToInsertSuffix(this, suffixList);
-
-        //        //find the node with the biggest substring  
-
-        //        //insert it there
-
-        //    }
-
-
-        //    public Node FindNodeToInsertSuffix(Node start, List<string> suffix)
-        //    {
-        //        foreach (Node child in start.Children)
-        //        {
-        //            if (child.Value.)
-        //        }
-        //    }
-
-        //    public void AddCharacter(char character, int stringNumber)
-        //    {
-        //        string charString = character.ToString();
-        //        //create node
-        //        Node newNode = new Node() { Value = charString };
-        //        newNode.BelongsToStrings.Add(stringNumber);
-
-        //        //if we aren't the root, add the character to our string
-        //        if (!string.IsNullOrEmpty(Value))
-        //        {
-        //            Value += character;
-        //        }
-
-        //        foreach (Node child in Children)
-        //        {
-        //            //we want to append the prefix to each of them. 
-        //            child.AddCharacter(character, stringNumber);
-        //        }
-
-        //        if (string.IsNullOrEmpty(Value))
-        //            //add a new child for it 
-        //            Children.Add(newNode);
-        //    }
-
-        //    public bool Equals(Node other)
-        //    {
-        //        return this.Value == other.Value;
-        //    }
-
-
-        //    public void Output()
-        //    {
-        //        if (!string.IsNullOrEmpty(Value))
-        //            Console.Write(Value + " - ");
-        //        foreach (Node child in Children)
-        //        {
-        //            child.Output();
-        //        }
-
-        //        if (Children.Count == 0)
-        //            Console.WriteLine();
-        //    }
-        //}
 
         #region Utils
         public static int ReadInt()
