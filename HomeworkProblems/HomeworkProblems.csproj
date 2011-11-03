@@ -34,7 +34,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>HomeworkProblems.Crank</StartupObject>
+    <StartupObject>HomeworkProblems.Money</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -87,6 +87,8 @@
     <Compile Include="Weekx12\DNAMatcher.cs" />
     <Compile Include="Weekx12\Crank.cs" />
     <Compile Include="Weekx13\Money.cs" />
+    <Compile Include="Weekx13\AntiBruteForceLock.cs" />
+    <Compile Include="Weekx13\IncredibleHull.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

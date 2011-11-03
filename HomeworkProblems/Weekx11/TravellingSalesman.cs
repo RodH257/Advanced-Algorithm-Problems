@@ -69,18 +69,11 @@ namespace HomeworkProblems
             nodes.Push(graphNodes[0]);
             bool[] visitedNodes = new bool[n];
             Queue<Node> nodePath = new Queue<Node>();
-           
-
-         //   Node lastNode = graphNodes[0];
             while (nodes.Count != 0)
             {
                 Node currentNode = nodes.Pop();
                 visitedNodes[currentNode.NodeNumber] = true;
-
-                //do calculations
-                //Console.Write(currentNode.NodeNumber + " ");
                 nodePath.Enqueue(currentNode);
-               // lastNode = currentNode;
 
                 //look at edges from current node to others
                 foreach (Edge edge in currentNode.TreeEdges)
@@ -92,15 +85,14 @@ namespace HomeworkProblems
                     if (!nodes.Contains(edge.Destination))
                     {
                         nodes.Push(edge.Destination);
-                      //  totalWeight += edge.Weight;
                     }
                 }
 
             }
-            //enquie the source
+            //enque the source
             nodePath.Enqueue(graphNodes[0]);
 
-
+            //walk the path calculating the weight
             double totalWeight = 0;
             Node previous = nodePath.Dequeue();
             Console.Write(previous.NodeNumber + " ");
@@ -121,7 +113,6 @@ namespace HomeworkProblems
             }
          
             return totalWeight;
-
         }
 
         static double GetEucDistance(Node start, Node destination)

@@ -51,19 +51,6 @@ namespace HomeworkProblems
             }
         }
 
-
-  //      MaximumMatching(G)
-  //set cardinality to 0 
-  //for source in left side vertices do
-  //  for vertex in right side vertices do
-  //    set visited to False
-  //  end for
-  //  if FindAugmentingPath(source) then
-  //    increment cardinality
-  //  end if
-  //end for
-  //return cardinality
-
         private static int GetMaximumCardinality(Node[] nodes, int n, int m)
         {
             int cardinality = 0;

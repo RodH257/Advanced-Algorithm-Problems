@@ -3,45 +3,60 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace HomeworkProblems.ConvexHull
+namespace HomeworkProblems
 {
     /// <summary>
     /// Rod Howarth - n6294685
     /// Team14
     /// </summary>
-    class ConvexHull
+    public class IncredibleHull
     {
-        public static void Main(string[] args)
+        private static void Main(string[] args)
         {
-            //get number of test case
-            var numCases = Int32.Parse(Console.ReadLine());
+            string currentLine = Console.ReadLine();
 
-            for (int testCaseNum = 0; testCaseNum < numCases; testCaseNum++)
+            while (true)
             {
-                int numPlants = Int32.Parse(Console.ReadLine());
+                if (currentLine.Equals("END"))
+                    break;
 
-                List<Point> plantLocations = new List<Point>();
-                for (int plant = 0; plant < numPlants; plant++)
+                string name = currentLine.Replace("S ", "");
+                List<Point> points = new List<Point>();
+                while (true)
                 {
-                    var splitInts = GetSplitInts(Console.ReadLine());
-                    //add x y
-                    plantLocations.Add(new Point(splitInts[0], splitInts[1]));
-                }
+                    currentLine = Console.ReadLine();
+               
+                    if (currentLine.StartsWith("P"))
+                    {
+                        //its a polygon for this test case 
 
+                        var positions = GetSplitInts(currentLine.Replace("P ", ""));
 
-                List<Point> hull = FindConvexHull(plantLocations);
+                        int numPoints = positions[0];
 
-                double totalLength = 0;
-                for (int i = 0; i < hull.Count; i++)
-                {
-                    if (i == hull.Count - 1)
-                        totalLength += hull[i].LengthTo(hull[0]);
+                        for (int i = 1; i <= numPoints * 2; i += 2)
+                        {
+                            var x = positions[i];
+                            var y = positions[i + 1];
+                            points.Add(new Point(x, y));
+                        }
+                    }
                     else
-                        totalLength += hull[i].LengthTo(hull[i + 1]);
+                    {
+                        break;
+                    }
                 }
 
-                var cost = totalLength * 5 + hull.Count;
-                Console.WriteLine("${0:0.00}", cost);
+
+                //have all the points 
+
+                List<Point> hull = FindConvexHull(points);
+                Console.WriteLine(name + " convex hull:");
+                foreach (Point point in hull)
+                {
+                    Console.Write("({0},{1}) ", point.X, point.Y);
+                }
+                Console.WriteLine();
             }
         }
 
@@ -66,8 +81,7 @@ namespace HomeworkProblems.ConvexHull
                 var vector = Vector.VectorBetween(min, point);
 
                 //Gets angle to y = 0
-                var angle = vector.AngleTo(new Vector(min.X +4, min.Y));
-
+                var angle = vector.AngleTo(new Vector(min.X + 4, min.Y));
                 //dirty hack
                 vector.PointItBelongsTo = point;
                 if (vectorsFromZero.ContainsKey(angle))
@@ -98,14 +112,14 @@ namespace HomeworkProblems.ConvexHull
                     Vector endPoint = sortedVectors[i];
                     //pretend the vectors are points, and get the vector between those oitns
                     //first vector will be from the start to the corner
-                    Vector firstLine = Vector.VectorBetween(startPoint, cornerPoint);   
+                    Vector firstLine = Vector.VectorBetween(startPoint, cornerPoint);
                     //from the corner to next point 
                     Vector secondLine = Vector.VectorBetween(cornerPoint, endPoint);
 
                     bool isRightTurn = IsNonLeftTurn(firstLine, secondLine);
                     if (!isRightTurn)
                     {
-                        //put the top one back on
+                        //put the top one bac kon
                         stack.Push(cornerPoint);
                         break;
                     }
@@ -114,6 +128,9 @@ namespace HomeworkProblems.ConvexHull
                 stack.Push(sortedVectors[i]);
             }
 
+            var list = stack.ToList();
+
+            return list.Select(x => x.PointItBelongsTo).ToList();
             //we only need to know the lengths, so no need to convert the vector points back into proper points to 0.
             return stack.Cast<Point>().ToList();
         }
@@ -154,10 +171,11 @@ namespace HomeworkProblems.ConvexHull
             }
         }
 
-        public class Vector: Point
+        public class Vector : Point
         {
-            public Point PointItBelongsTo = null;
-            public Vector(int x, int y) : base(x, y)
+            public Point PointItBelongsTo;
+            public Vector(int x, int y)
+                : base(x, y)
             {
             }
 
@@ -193,11 +211,12 @@ namespace HomeworkProblems.ConvexHull
 
 
 
+
         #region Utils
         public static int ReadInt()
         {
             string line = Console.ReadLine();
-            return Int32.Parse(line);
+            return int.Parse(line);
         }
 
         public static int[] GetSplitInts(string input)
@@ -205,7 +224,7 @@ namespace HomeworkProblems.ConvexHull
             string[] intStrings = input.Split(' ');
             int[] splitInts = new int[intStrings.Length];
             for (int i = 0; i < intStrings.Length; i++)
-                splitInts[i] = Int32.Parse(intStrings[i]);
+                splitInts[i] = int.Parse(intStrings[i]);
             return splitInts;
         }
 
@@ -214,11 +233,10 @@ namespace HomeworkProblems.ConvexHull
             string[] intStrings = Console.ReadLine().Split(' ');
             int[] splitInts = new int[intStrings.Length];
             for (int i = 0; i < intStrings.Length; i++)
-                splitInts[i] = Int32.Parse(intStrings[i]);
+                splitInts[i] = int.Parse(intStrings[i]);
             return splitInts;
         }
         #endregion
     }
-
 }
 

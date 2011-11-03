@@ -1,2 +1,0 @@
-Test 1: Minimum Cost = 140
-Test 2: Minimum Cost = 74

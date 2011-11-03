@@ -11,14 +11,71 @@ namespace HomeworkProblems
     /// </summary>
     public class Money
     {
+        private const int SENTINEL = 10000;
         private static void Main(string[] args)
         {
-            int numTestCases = int.Parse(Console.ReadLine());
-            for (int testCaseNum = 1; testCaseNum <= numTestCases; testCaseNum++)
+            int testCaseNum = 0;
+            while (true)
             {
+                int numberBanks = ReadInt();
+
+                if (numberBanks == 0)
+                    break;
+
+                testCaseNum++;
+
+                int[,] matrix = new int[numberBanks,numberBanks];
+
+                int originalCash = 0; 
+
+                for (int bankNumber = 0; bankNumber < numberBanks; bankNumber++)
+                {
+                    var line = GetSplitInts();
+
+                    for (int adjbank = 0; adjbank < numberBanks; adjbank++)
+                    {
+                        matrix[bankNumber, adjbank] = line[adjbank];
+
+                        if (line[adjbank] > 0)
+                            originalCash += line[adjbank];
+                    }
+                }
+
+
+                int totalCashNeeded = 0;
+                for (int node = 0; node < numberBanks; node++)
+                {
+                    int totalIn = 0;
+                    int totalOut = 0;
+                    for (int adj = 0; adj < numberBanks; adj++)
+                    {
+                        totalIn += matrix[adj, node];
+                        totalOut += matrix[node, adj];
+
+
+                    }
+                    int diff = totalOut - totalIn;
+                    if (totalOut > totalIn)
+                    {
+                        totalCashNeeded += diff;
+                    }
+            
+                }
+
+
+
+
+
+            //    int shortestPathWeight = GetShortestPathWeight(numberBanks + 2, numberBanks, destNode, matrix) - (SENTINEL * 2);
+                Console.WriteLine("{0}. {1} {2}", testCaseNum, originalCash, totalCashNeeded);
+
 
             }
         }
+
+
+
+
 
         #region Utils 
         public static int ReadInt()

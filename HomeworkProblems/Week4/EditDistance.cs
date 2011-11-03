@@ -32,7 +32,7 @@ namespace HomeworkProblems
                 return x.Length;
 
             int m = x.Length;
-            int n = y.Length ;
+            int n = y.Length;
 
             int[][] editDistances = new int[m + 1][];
 
@@ -57,7 +57,8 @@ namespace HomeworkProblems
                         diff = 0;
                     int swappingCost = editDistances[i - 1][j - 1] + diff;
 
-                    List<int> costs = new List<int> { insertionCost, deletionCost, swappingCost };
+                    List<int> costs = new List<int> 
+                    { insertionCost, deletionCost, swappingCost };
                     editDistances[i][j] = costs.Min();
                 }
             }
