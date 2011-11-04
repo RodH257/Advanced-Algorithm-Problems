@@ -7,6 +7,9 @@ Demonstrate a number of techinques including:
 - Line Intersection
 - String Matching
 - Maximum Flow 
+- Min Cost Max Flow
+- Edit Distance
 - Stable Marriage
 
-and more. 
+and more. They accept console based text input and output results to the console. 
+Various problem statements are available in the solution. 
